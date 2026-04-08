@@ -1845,6 +1845,3 @@ const incidnetRenewalFile = computed(() => {
 
 onMounted(getfetch_katri_detail);
 </script>
-
-<style scoped>
-</style>
