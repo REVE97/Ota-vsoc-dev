@@ -221,13 +221,13 @@
               <th class="required">아이템에 대한 지식
                 <div class="tooltip">
                   <i></i>
-                  <p>1~11사이 숫자만 입력해주세요.</p>
+                  <p>0~11사이 숫자만 입력해주세요.</p>
                 </div>
               </th>
               <td class="input">
                 <input 
                   type="text" 
-                  placeholder="기술 전문성 점수 입력 (1~11 사이 값)" 
+                  placeholder="아이템에 대한 지식 점수 입력 (0~11 사이 값)" 
                   v-model.number="postData.data.preAfKnowledgeOfItem"
                   @input="onlyNumber($event, postData.data, 'preAfKnowledgeOfItem')"
                   />
@@ -338,13 +338,13 @@
               <th class="required">아이템에 대한 지식
                 <div class="tooltip">
                   <i></i>
-                  <p>1~11사이 숫자만 입력해주세요.</p>
+                  <p>0~11사이 숫자만 입력해주세요.</p>
                 </div>
               </th>
               <td class="input">
                 <input 
                   type="text" 
-                  placeholder="기술 전문성 점수 입력 (1~11 사이 값)" 
+                  placeholder="아이템에 대한 지식 점수 입력 (0~11 사이 값)" 
                   v-model.number="postData.data.postAfKnowledgeOfItem"
                   @input="onlyNumber($event, postData.data, 'postAfKnowledgeOfItem')"
                   />
@@ -522,18 +522,68 @@
               <td></td>
             </tr>
             <tr>
-              <th>취약점 관리 상태</th>
+              <th>취약점 관리 상태 증빙 파일</th>
               <td class="file" colspan="3">
-                <form @submit.prevent="postfetch_vulnerability_report_evidence_file">
+                <form>
                   <div class="group">
                     <div class="input">
-                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="vulnerabilityEvidenceData.fileCategory" readonly>
+                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="vulnerabilityEvidenceData.file?.name" readonly>
                       <label>파일 선택
                         <input type="file" @change="onVulnerabilityFileChange" />
                       </label>
                     </div>
-                    <div class="button">
-                      <button type="submit">업로드</button>
+                  </div>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+      <article class="table">
+        <strong>이력 관리</strong>
+        <table>
+          <colgroup>
+            <col width="240px" />
+            <col width="auto" />
+            <col width="240px" />
+            <col width="auto" />
+          </colgroup>
+          <tbody>
+            <tr>
+              <th class="required">활동</th>
+              <td class="input">
+                <input 
+                  type="text" 
+                  placeholder="활동명을 입력해주세요."
+                  v-model="postData.data.hisAction.activity" />
+              </td>
+              <th class="required">담당자</th>
+              <td class="input">
+                <input 
+                  type="text" 
+                  placeholder="담당자를 입력해주세요."
+                  v-model="postData.data.hisAction.manager" />
+              </td>
+            </tr>
+            <tr>
+              <th>이력 관리 파일</th>
+              <td class="file" colspan="3">
+                <form>
+                  <div class="group">
+                    <div class="input">
+                      <input
+                        type="text"
+                        placeholder="업로드할 파일을 선택하세요"
+                        :value="vulnerabilityHisData.file?.name"
+                        readonly
+                      />
+                      <label
+                        >파일 선택
+                        <input
+                          type="file"
+                          @change="onVulnerabilityHisFileChange"
+                        />
+                      </label>
                     </div>
                   </div>
                 </form>
@@ -608,6 +658,11 @@ const postData = ref({
       fileIdList: [],
       deleteFileIdList: null,
     },
+    hisAction: {
+      fileId: null,
+      activity: "",
+      manager: "",
+    },
   }
 })
 
@@ -626,9 +681,18 @@ const isValid = ref({
 
 // 사용자가 필수 요소를 모두 입력해야 버튼 활성화
 const isAllInput = computed(() => {
-  return Object.values(postData.value.data).every(
-    (value) => value !== null && value !== undefined && value !== ""
-  );
+
+  const inputBaseValid = Object.values(postData.value.data).every(
+    (value) => value !== null && value !== undefined && value !== "",
+  )
+
+  const inputHisActionValid = Object.entries(postData.value.data.hisAction).every(([key, value]) => {
+    if (key === "fileId") return true;
+
+    return value !== null && value !== undefined && value !== "";
+  })
+
+  return inputBaseValid && inputHisActionValid;
 });
 
 // 숫자만 입력하게 가능
@@ -781,37 +845,87 @@ const openCancelConfirm = () => {
   })
 };
 
-// 파일업로드 테스트 (현재 DLP 파일 반출 보안 문제로 file은 제외하고 테스트)
+// 파일업로드 관련 코드
+
+// 취약점 관리 파일 데이터 상태값
 const vulnerabilityEvidenceData = ref({
   fileType: "VULNERABILITY_REPORT",
   fileCategory: "EVIDENCE",
-  // file: null,
+  file: null,
+});
+
+// 이력 관리 파일 데이터 상태값
+const vulnerabilityHisData = ref({
+  fileType: "VULNERABILITY_REPORT_HIS",
+  fileCategory: "VULNERABILITY_REPORT_HIS",
+  file: null,
 })
 
-const onVulnerabilityFileChange = (e) => {
-  vulnerabilityEvidenceData.value.file = e.target.files[0];
+// 취약점 관리 파일 file 속성 이벤트 함수
+const onVulnerabilityFileChange = async (e) => {
+  const selectFile = e.target.files[0];
+
+  if (!selectFile) return;
+
+  vulnerabilityEvidenceData.value.file = selectFile;
+  await postfetch_vulnerability_report_evidence_file();
+  
+  e.target.value = "";
 }
 
-const postfetch_vulnerability_report_evidence_file = async() => {
+// 이력 관리 파일 file 속성 이벤트 함수
+const onVulnerabilityHisFileChange = async (e) => {
+  const selectFile = e.target.files[0];
+
+  if (!selectFile) return;
+
+  vulnerabilityHisData.value.file = selectFile;
+  await postfetch_vulnerability_report_his_file();
+
+  e.target.value = "";
+}
+
+// 취약점 관리 파일 업로드 API 호출
+const postfetch_vulnerability_report_evidence_file = async () => {
   const formData = new FormData();
-  formData.append("fileType",vulnerabilityEvidenceData.value.fileType);
-  formData.append("fileCategory",vulnerabilityEvidenceData.value.fileCategory);
-  // formData.append("file",vulnerabilityEvidenceData.value.file);
-  
+  formData.append("fileType", vulnerabilityEvidenceData.value.fileType);
+  formData.append("fileCategory", vulnerabilityEvidenceData.value.fileCategory);
+  formData.append("file",vulnerabilityEvidenceData.value.file);
+
   try {
-    const res = await axios.post('/api/vsoc/file',formData,{
+    const res = await axios.post("/api/vsoc/file", formData, {
       headers: {
-        "Content-Type" : "multipart/form-data"
-      }
+        "Content-Type": "multipart/form-data",
+      },
     });
-    console.log(res);
+
     const fileId = res.data.data.fileId;
-    console.log(fileId);
     postData.value.data.fileAction.fileIdList.push(fileId);
-    console.log(postData.value.data.fileAction.fileIdList);
   } catch (error) {
     console.error(error);
-    alert('파일 업로드 실패');
+    alert("파일 업로드 실패");
+  }
+}
+
+// 이력 관리 파일 업로드 API 호출
+const postfetch_vulnerability_report_his_file = async () => {
+  const formData = new FormData();
+  formData.append("fileType", vulnerabilityHisData.value.fileType);
+  formData.append("fileCategory", vulnerabilityHisData.value.fileCategory);
+  formData.append("file",vulnerabilityEvidenceData.value.file);
+
+  try {
+    const res = await axios.post("/api/vsoc/file", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+   
+    const fileId = res.data.data.fileId;
+    postData.value.data.hisAction.fileId = fileId;
+  } catch (error) {
+    console.error(error);
+    alert("파일 업로드 실패");
   }
 }
 //
@@ -821,6 +935,3 @@ onMounted(() =>{
   getfetch_button_link();
 });
 </script>
-
-<style scoped>
-</style>

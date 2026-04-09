@@ -196,18 +196,8 @@
             </tr>
             <tr>
               <th class="required">위협 발생 시간 (종료,계속)</th>
-              <td>
-                <div class="input calendar">
-                    <Datepicker
-                      v-model="postData.threatOccurrenceTime"
-                      format="yyyy-MM-dd"
-                      model-type="format"
-                      :enable-time-picker="false"
-                      :clearable="false"
-                      :hideInputIcon="true"
-                      locale="ko"></Datepicker>
-                    <label></label>
-                  </div>
+              <td class="input">
+                <input type="text" placeholder="예) 2026-02-25 02:10-02:45" v-model="postData.threatOccurrenceTime">
               </td>
             </tr>
             <tr>
@@ -225,16 +215,13 @@
             <tr>
               <th>첨부파일</th>
               <td class="file" colspan="2">
-                <form @submit.prevent="postfetch_incidentThreat_threat_file">
+                <form>
                   <div class="group">
                     <div class="input">
-                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="incidentThreatData.fileCategory" readonly>
+                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="incidentThreatData.file?.name" readonly>
                       <label>파일 선택
-                        <input type="file" @change="onThreatFileChange" />
+                        <input type="file" @change="(e) => onFileChange(e,incidentThreatData)" />
                       </label>
-                    </div>
-                    <div class="button">
-                      <button type="submit">업로드</button>
                     </div>
                   </div>
                 </form>
@@ -425,22 +412,33 @@ const openTempDone = () => {
   })
 };
 
-// 파일업로드 테스트 (현재 DLP 파일 반출 보안 문제로 file은 제외하고 테스트)
+// 파일업로드 관련 코드
+
+// 위협 신고 내역 파일 첨부 데이터 상태값
 const incidentThreatData = ref({
   fileType: "INCIDENT_THREAT",
   fileCategory: "THREAT_DATA",
-  // file: null,
+  file: null,
 })
 
-const onThreatFileChange = (e) => {
-  incidentThreatData.value.file = e.target.files[0];
+// 파일 선택 이벤트 처리
+const onFileChange = async (e, data) => {
+  const selectFile = e.target.files[0];
+
+  if (!selectFile) return;
+
+  data.file = selectFile;
+  await postfetch_incidentThreat_threat_file(data);
+
+  e.target.value = "";
 }
 
-const postfetch_incidentThreat_threat_file = async() => {
+// 파일 업로드 API 호출
+const postfetch_incidentThreat_threat_file = async (fileData) => {
   const formData = new FormData();
-  formData.append("fileType",incidentThreatData.value.fileType);
-  formData.append("fileCategory",incidentThreatData.value.fileCategory);
-  // formData.append("file",incidentThreatData.value.file);
+  formData.append("fileType",fileData.fileType);
+  formData.append("fileCategory",fileData.fileCategory);
+  formData.append("file",fileData.file);
   
   try {
     const res = await axios.post('/api/vsoc/file',formData,{
@@ -448,19 +446,13 @@ const postfetch_incidentThreat_threat_file = async() => {
         "Content-Type" : "multipart/form-data"
       }
     });
-    console.log(res);
+    
     const fileId = res.data.data.fileId;
-    console.log(fileId);
     postData.value.fileAction.fileIdList.push(fileId);
-    console.log(postData.value.fileAction.fileIdList);
   } catch (error) {
     console.error(error);
     alert('파일 업로드 실패');
   }
 }
 //
-
 </script>
-
-<style scoped>
-</style>

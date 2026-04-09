@@ -460,16 +460,13 @@
             <tr>
               <th colspan="2">파일 첨부</th>
               <td class="file">
-                <form @submit.prevent="postfetch_incident_receipt_file">
+                <form>
                   <div class="group">
                     <div class="input">
-                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="incidentReceiptData.fileCategory" readonly>
+                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="incidentReceiptData.file?.name" readonly>
                       <label>파일 선택
-                        <input type="file" @change="onFileChange" />
+                        <input type="file" @change="(e) => onFileChange(e,incidentReceiptData)" />
                       </label>
-                    </div>
-                    <div class="button">
-                      <button type="submit">업로드</button>
                     </div>
                   </div>
                 </form>
@@ -714,22 +711,31 @@ const openTempDone = () => {
   })
 };
 
-// 파일업로드 테스트 (현재 DLP 파일 반출 보안 문제로 file은 제외하고 테스트)
+// 파일업로드 관련 코드
 const incidentReceiptData = ref({
   fileType: "INCIDENT",
   fileCategory: "RECEIPT_DATA",
-  // file: null,
+  file: null,
 })
 
-const onFileChange = (e) => {
-  incidentReceiptData.value.file = e.target.files[0];
+// 파일 선택 이벤트 처리
+const onFileChange = async (e, data) => {
+  const selectFile = e.target.files[0];
+
+  if (!selectFile) return;
+  
+  data.file = selectFile;
+  await postfetch_incident_file(data);
+
+  e.target.value = "";
 }
 
-const postfetch_incident_receipt_file = async() => {
+// 파일 업로드 API 호출
+const postfetch_incident_file = async (filedata) => {
   const formData = new FormData();
-  formData.append("fileType",incidentReceiptData.value.fileType);
-  formData.append("fileCategory",incidentReceiptData.value.fileCategory);
-  // formData.append("file",incidentReceiptData.value.file);
+  formData.append("fileType",filedata.fileType);
+  formData.append("fileCategory",filedata.fileCategory);
+  formData.append("file",filedata.file);
   
   try {
     const res = await axios.post('/api/vsoc/file',formData,{
@@ -737,19 +743,12 @@ const postfetch_incident_receipt_file = async() => {
         "Content-Type" : "multipart/form-data"
       }
     });
-    console.log(res);
     const fileId = res.data.data.fileId;
-    console.log(fileId);
     postData.value.fileAction.fileIdList.push(fileId);
-    console.log(postData.value.fileAction.fileIdList);
   } catch (error) {
     console.error(error);
     alert('파일 업로드 실패');
   }
 }
 //
-
 </script>
-
-<style scoped>
-</style>

@@ -227,17 +227,16 @@
             </tr>
             <tr>
               <th>첨부파일</th>
-              <td>{{ allData?.fileList?.[0].fileCategoryDescription }}</td>
+              <td 
+                class="group" 
+                v-for="item in incidnetThreatFileList">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
+              </td>
             </tr>
           </tbody>
         </table>
       </article>
       <article class="group button">
-        <!-- <router-link 
-          v-if="allData?.status !== 'FINISH'"
-          :to="{ name: 'threat_report_close', params: { id: route.params.id }}">
-          <button>종료</button>
-        </router-link> -->
         <router-link 
           :to="{ name: 'threat_report_update', params: { id: route.params.id }}">
           <button :disabled="!route.params.id">수정</button>
@@ -272,6 +271,10 @@ const parsingIsnetworklawviol = computed(() => {
   if(allData?.value?.isNetworkLawViolation === 0) return "N";
   return "";
 });
+
+// 위협 신고서 접수 자료 파싱
+const incidnetThreatFileList = computed(() => {
+  return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "위협 신고서 접수 자료")})
 
 // 신고 접수일 parsing 처리
 const padZero = (num) => String(num).padStart(2, "0");
@@ -312,7 +315,7 @@ const getfetch_threat_detail = async() => {
 const deletefetch_threat_detail = async () => {
   try {
     const incidentId = Number(route.params.id)
-    await axios.delete(`/api/vsoc/incident/${incidentId}/THREAT`);
+    await axios.post(`/api/vsoc/incident/${incidentId}/THREAT`);
   } catch (error) {
     console.error(error);
     alert('위협 신고서 삭제에 실패하였습니다.');

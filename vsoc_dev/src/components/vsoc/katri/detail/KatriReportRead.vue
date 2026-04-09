@@ -331,8 +331,10 @@
             </tr>
             <tr>
               <th colspan="2">파일 첨부</th>
-              <td class="group" v-for="item in incidnetReceiptFile?.slice(0,3)">
-                파일 ID : {{ item.id }} / 파일 설명 : {{ item.fileCategoryDescription }}
+              <td 
+                class="group" 
+                v-for="item in incidnetReceiptFileList">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
               </td>
             </tr>
           </tbody>
@@ -512,8 +514,10 @@
             </tr>
             <tr>
               <th colspan="2">파일 첨부</th>
-              <td class="group" v-for="item in incidnetRenewalFile?.slice(0,3)">
-                파일 ID : {{ item.id }} / 파일 설명 : {{ item.fileCategoryDescription }}
+              <td 
+                class="group" 
+                v-for="item in incidnetRenewalFileList">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
               </td>
             </tr>
           </tbody>
@@ -586,10 +590,10 @@ const formatDate = (date, includeTime = true) => {
 const getDate = (dateString) => formatDate(new Date(dateString));
 
 // 파일 (신고서 접수 자료/신고서 갱신 자료) Parsing (테스트중)
-const incidnetReceiptFile = computed(() => {
+const incidnetReceiptFileList = computed(() => {
   return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "신고서 접수 자료")})
 
-const incidnetRenewalFile = computed(() => {
+const incidnetRenewalFileList = computed(() => {
   return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "신고서 갱신 자료")})
 
 // KATRI 상세 조회 API 호출

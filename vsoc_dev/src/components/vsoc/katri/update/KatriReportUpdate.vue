@@ -724,8 +724,13 @@
             </tr>
             <tr>
               <th colspan="2">파일 첨부</th>
-              <td class="group" v-for="item in incidnetReceiptFile?.slice(0,3)">
-                파일 ID : {{ item.id }} / 파일 설명 : {{ item.fileCategoryDescription }}
+              <td class="group" v-for="item in incidnetReceiptFile">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
+                <button 
+                  style="border: 1px solid black; border-radius: 10px; padding: 2px 8px;" 
+                  @click="removeFileAction(item.id)">
+                  x
+                </button>
               </td>
               <td class="file">
                 <form>
@@ -1014,8 +1019,13 @@
             </tr>
             <tr>
               <th colspan="2">파일 첨부</th>
-              <td class="group" v-for="item in incidnetRenewalFile?.slice(0,3)">
-                파일 ID : {{ item.id }} / 파일 설명 : {{ item.fileCategoryDescription }}
+              <td class="group" v-for="item in incidnetRenewalFile">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
+                <button
+                  style="border: 1px solid black; border-radius: 10px; padding: 2px 8px;"
+                  @click="removeFileAction(item.id)">
+                  x
+                </button>
               </td>
               <td class="file">
                 <form>
@@ -1227,8 +1237,7 @@
               </td>
             </tr>
             <tr>
-              <th colspan="2">파일 첨부</th>
-              <td colspan="2">-</td>
+              <th colspan="2">파일 첨부</th>            
               <td class="file" colspan="3">
                 <form>
                   <div class="group">
@@ -1369,7 +1378,7 @@ const postData = ref({
   fileAction: {
     fileType: "INCIDENT",
     fileIdList: [],
-    deleteFileIdList: null,
+    deleteFileIdList: [],
   },
   deleteRenewalActionIdList: [],
 })
@@ -1600,6 +1609,17 @@ const removeRenewalAction = (item, index) => {
   syncRenewalActionToPostData();
 };
 
+// 첨부파일 삭제 메서드
+const removeFileAction = (fileId) => {
+  if(!fileId) return;
+
+  const deleteList = postData.value.fileAction.deleteFileIdList;
+
+  if(!deleteList.includes(fileId)) {
+    deleteList.push(fileId);
+  }
+}
+
 watch(
   () => inputCheckboxNone.value,
   (flags) => {
@@ -1791,19 +1811,23 @@ const openUpdateDone = () => {
   })
 };
 
-// 파일업로드 테스트 (현재 DLP 파일 반출 보안 문제로 file은 제외하고 테스트)
+// 파일업로드 관련 코드
+
+// 사고 접수 내역 파일 데이터 상태값
 const incidnetReceiptData = ref({
   fileType: "INCIDENT",
   fileCategory: "RECEIPT_DATA",
   file: null,
 })
 
+// 갱신 내역 파일 데이터 상태값
 const incidentRenewalData = ref({
   fileType: "INCIDENT",
   fileCategory: "RENEWAL_DATA",
   file: null,
 })
 
+// 파일 선택 이벤트 처리
 const onFileChange = async (e, data) => {
   const selectFile = e.target.files[0];
 
@@ -1811,10 +1835,11 @@ const onFileChange = async (e, data) => {
 
   data.file = selectFile;
   await postfetch_incident_file(data);
-  
+
   e.target.value = "";
 }
 
+// 파일 업로드 API 호출
 const postfetch_incident_file = async(fileData) => {
   const formData = new FormData();
   formData.append("fileType",fileData.fileType);
@@ -1835,12 +1860,28 @@ const postfetch_incident_file = async(fileData) => {
   }
 }
 
-// 파일 (신고서 접수 자료/신고서 갱신 자료) Parsing (테스트중)
+// 파일 (신고서 접수 자료/신고서 갱신 자료) Parsing
 const incidnetReceiptFile = computed(() => {
-  return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "신고서 접수 자료")})
+  const deleteFileIdList = postData.value.fileAction.deleteFileIdList ?? [];
+
+  return allData.value?.fileList?.filter( item => {
+    return (
+    item.fileCategoryDescription === "신고서 접수 자료" && 
+    !deleteFileIdList.includes(item.id)
+  );
+  }) ?? [];
+})
 
 const incidnetRenewalFile = computed(() => {
-  return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "신고서 갱신 자료")})
+  const deleteFileIdList = postData.value.fileAction.deleteFileIdList ?? [];
+
+  return allData.value?.fileList?.filter( item => {
+    return (
+    item.fileCategoryDescription === "신고서 갱신 자료" && 
+    !deleteFileIdList.includes(item.id)
+  );
+  }) ?? [];
+})
 //
 
 onMounted(getfetch_katri_detail);

@@ -233,7 +233,11 @@
                     </select>
                   </div>
                   <div class="input"> 
-                    <input type="text" placeholder="미디어 노출 정보를 입력해주세요" v-model="postData.data.isMediaExposedInfo"/>
+                    <input 
+                      type="text" 
+                      placeholder="미디어 노출 정보를 입력해주세요" 
+                      v-model="postData.data.isMediaExposedInfo"
+                      :disabled="postData.data.isMediaExposed === 0" />
                   </div>
                 </div>
               </td>
@@ -310,16 +314,13 @@
             <tr>
               <th>첨부파일</th>
               <td class="file" colspan="3">
-                <form @submit.prevent="postfetch_cyber_report_init_evidence_file">
+                <form>
                   <div class="group">
                     <div class="input">
-                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberInitEvidenceData.fileCategory" readonly>
+                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberInitEvidenceData.file?.name" readonly>
                       <label>파일 선택
-                        <input type="file" @change="onCyberFileChange" />
+                        <input type="file" @change="(e) => onFileChange(e,cyberInitEvidenceData)" />
                       </label>
-                    </div>
-                    <div class="button">
-                      <button type="submit">업로드</button>
                     </div>
                   </div>
                 </form>
@@ -328,16 +329,13 @@
             <tr>
               <th>사이버보안 사고 대응 절차, 역할 및 대응 일정 보고서</th>
               <td class="file" colspan="3">
-                <form @submit.prevent="postfetch_cyber_report_init_procedure_file">
+                <form>
                   <div class="group">
                     <div class="input">
-                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberInitProcedureData.fileCategory" readonly>
+                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberInitProcedureData.file?.name" readonly>
                       <label>파일 선택
-                        <input type="file" @change="onCyberFileChange" />
+                        <input type="file" @change="(e) => onFileChange(e,cyberInitProcedureData)" />
                       </label>
-                    </div>
-                    <div class="button">
-                      <button type="submit">업로드</button>
                     </div>
                   </div>
                 </form>
@@ -346,16 +344,13 @@
             <tr>
               <th>사이버보안 사고 대응 계획 보고서</th>
               <td class="file" colspan="3">
-                <form @submit.prevent="postfetch_cyber_report_init_plan_file">
+                <form>
                   <div class="group">
                     <div class="input">
-                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberInitPlanData.fileCategory" readonly>
+                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberInitPlanData.file?.name" readonly>
                       <label>파일 선택
-                        <input type="file" @change="onCyberFileChange" />
+                        <input type="file" @change="(e) => onFileChange(e,cyberInitPlanData)" />
                       </label>
-                    </div>
-                    <div class="button">
-                      <button type="submit">업로드</button>
                     </div>
                   </div>
                 </form>
@@ -481,16 +476,13 @@
             <tr>
               <th>첨부파일</th>
               <td class="file" colspan="3">
-                <form @submit.prevent="postfetch_cyber_report_renewal_evidence_file">
+                <form>
                   <div class="group">
                     <div class="input">
-                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberRenewalEvidenceData.fileCategory" readonly>
+                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberRenewalEvidenceData.file?.name" readonly>
                       <label>파일 선택
-                        <input type="file" @change="onCyberFileChange" />
+                        <input type="file" @change="(e) => onFileChange(e,cyberRenewalEvidenceData)" />
                       </label>
-                    </div>
-                    <div class="button">
-                      <button type="submit">업로드</button>
                     </div>
                   </div>
                 </form>
@@ -499,16 +491,13 @@
             <tr>
               <th>사이버보안 사고 대응 계획 보고서</th>
               <td class="file" colspan="3">
-                <form @submit.prevent="postfetch_cyber_report_renewal_plan_file">
+                <form>
                   <div class="group">
                     <div class="input">
-                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberRenewalPlanData.fileCategory" readonly>
+                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberRenewalPlanData.file?.name" readonly>
                       <label>파일 선택
-                        <input type="file" @change="onCyberFileChange" />
+                        <input type="file" @change="(e) => onFileChange(e,cyberRenewalPlanData)" />
                       </label>
-                    </div>
-                    <div class="button">
-                      <button type="submit">업로드</button>
                     </div>
                   </div>
                 </form>
@@ -574,16 +563,13 @@
             <tr>
               <th>첨부파일</th>
               <td class="file" colspan="3">
-                <form @submit.prevent="postfetch_cyber_report_final_evidence_file">
+                <form>
                   <div class="group">
                     <div class="input">
-                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberFinalEvidenceData.fileCategory" readonly>
+                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberFinalEvidenceData.file?.name" readonly>
                       <label>파일 선택
-                        <input type="file" @change="onCyberFileChange" />
+                        <input type="file" @change="(e) => onFileChange(e,cyberFinalEvidenceData)" />
                       </label>
-                    </div>
-                    <div class="button">
-                      <button type="submit">업로드</button>
                     </div>
                   </div>
                 </form>
@@ -592,16 +578,13 @@
             <tr>
               <th>사고 대응 보고서</th>
               <td class="file" colspan="3">
-                <form @submit.prevent="postfetch_cyber_report_final_report_file">
+                <form>
                   <div class="group">
                     <div class="input">
-                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberFinalReportData.fileCategory" readonly>
+                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="cyberFinalReportData.file?.name" readonly>
                       <label>파일 선택
-                        <input type="file" @change="onCyberFileChange" />
+                        <input type="file" @change="(e) => onFileChange(e,cyberFinalReportData)" />
                       </label>
-                    </div>
-                    <div class="button">
-                      <button type="submit">업로드</button>
                     </div>
                   </div>
                 </form>
@@ -632,7 +615,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useAppStore } from '@/store/app';
 import { useRouter, useRoute } from 'vue-router';
 import { getDate } from '@/common/common';
@@ -737,9 +720,11 @@ const isAllInput = computed(() => {
   postData.value.data.renewal.actionPlanDate = `${inputDateTime.value.renewalActionDate} ${inputDateTime.value.renwalActionTime}`;
   postData.value.data.finish.actionPlanDate = `${inputDateTime.value.finishActionDate} ${inputDateTime.value.finishActionTime}`;
 
-  const inputBaseValid = Object.values(postData.value.data).every(
-    (value) => value !== null && value !== undefined && value !== ""
-  )
+  const inputBaseValid = Object.entries(postData.value.data).every(([key, value]) => {
+    if (key === "isMediaExposedInfo") return true; // 미디어 노출 여부 정보는 필수 제외
+
+    return value !== null && value !== undefined && value !== ""
+  })
 
   const inputRenewalValid = Object.values(postData.value.data.renewal).every(
     (value) => value !== null && value !== undefined && value !== ""
@@ -758,6 +743,18 @@ const parseTime = (dateTimeString) => {
 
   return `${time}`;
 }
+
+watch(
+  () => postData.value.data.isMediaExposed,
+  (newVal) => {
+    if (newVal === 0){
+      postData.value.data.isMediaExposedInfo = "";
+    }
+    if (newVal === 1){
+      postData.value.data.isMediaExposedInfo = getData.value.isMediaExposedInfo;
+    }
+  }
+)
 
 // 사이버 리포트 작성 API 호출 
 const postfetch_cyber = async() => {
@@ -879,59 +876,75 @@ const openCancelConfirm = () => {
   })
 };
 
-// 파일업로드 테스트 (현재 DLP 파일 반출 보안 문제로 file은 제외하고 테스트)
+// 파일업로드 관련 코드
+
+// 최초 첨부파일 데이터 상태값
 const cyberInitEvidenceData = ref({
   fileType: "CYBER_REPORT",
   fileCategory: "INIT_EVIDENCE",
-  // file: null,
+  file: null,
 })
 
+// 최초 대응 절차, 일정 보고서 데이터 상태값
 const cyberInitProcedureData = ref({
   fileType: "CYBER_REPORT",
   fileCategory: "INIT_PROCEDURE",
-  // file: null,
+  file: null,
 })
 
+// 최초 대응 계획 보고서 데이터 상태값
 const cyberInitPlanData = ref({
   fileType: "CYBER_REPORT",
   fileCategory: "INIT_PLAN",
-  // file: null,
+  file: null,
 })
 
+// 갱신 첨부파일 데이터 상태값
 const cyberRenewalEvidenceData = ref({
   fileType: "CYBER_REPORT",
   fileCategory: "RENEWAL_EVIDENCE",
-  // file: null,
+  file: null,
 })
 
+// 갱신 대응 계획 보고서 데이터 상태값
 const cyberRenewalPlanData = ref({
   fileType: "CYBER_REPORT",
   fileCategory: "RENEWAL_PLAN",
-  // file: null,
+  file: null,
 })
 
+// 종료 첨부파일 데이터 상태값
 const cyberFinalEvidenceData = ref({
   fileType: "CYBER_REPORT",
   fileCategory: "FINAL_EVIDENCE",
-  // file: null,
+  file: null,
 })
 
+// 종료 사고 대응 보고서 데이터 상태값
 const cyberFinalReportData = ref({
   fileType: "CYBER_REPORT",
   fileCategory: "FINAL_REPORT",
-  // file: null,
+  file: null,
 })
 
-// 추후 file 속성 추가할때 추가할 예정
-const onCyberFileChange = (e) => {
-  cyberInitEvidenceData.value.file = e.target.files[0];
+// 파일 선택 이벤트 처리
+const onFileChange = async (e, data) => {
+  const selectFile = e.target.files[0];
+
+  if (!selectFile) return;
+
+  data.file = selectFile;
+  await postfetch_cyber_report_file(data);
+
+  e.target.value = "";
 }
 
-const postfetch_cyber_report_init_evidence_file = async() => {
+// 파일 업로드 API 호출
+const postfetch_cyber_report_file = async (fileData) => {
   const formData = new FormData();
-  formData.append("fileType",cyberInitEvidenceData.value.fileType);
-  formData.append("fileCategory",cyberInitEvidenceData.value.fileCategory);
-  // formData.append("file",cyberInitEvidenceData.value.file);
+  formData.append("fileType",fileData.fileType);
+  formData.append("fileCategory",fileData.fileCategory);
+  formData.append("file",fileData.file);
   
   try {
     const res = await axios.post('/api/vsoc/file',formData,{
@@ -939,149 +952,9 @@ const postfetch_cyber_report_init_evidence_file = async() => {
         "Content-Type" : "multipart/form-data"
       }
     });
-    console.log(res);
+    
     const fileId = res.data.data.fileId;
-    console.log(fileId);
     postData.value.data.fileAction.fileIdList.push(fileId);
-    console.log(postData.value.data.fileAction.fileIdList);
-  } catch (error) {
-    console.error(error);
-    alert('파일 업로드 실패');
-  }
-}
-
-const postfetch_cyber_report_init_procedure_file = async() => {
-  const formData = new FormData();
-  formData.append("fileType",cyberInitProcedureData.value.fileType);
-  formData.append("fileCategory",cyberInitProcedureData.value.fileCategory);
-  // formData.append("file",cyberInitProcedureData.value.file);
-  
-  try {
-    const res = await axios.post('/api/vsoc/file',formData,{
-      headers: {
-        "Content-Type" : "multipart/form-data"
-      }
-    });
-    console.log(res);
-    const fileId = res.data.data.fileId;
-    console.log(fileId);
-    postData.value.data.fileAction.fileIdList.push(fileId);
-    console.log(postData.value.data.fileAction.fileIdList);
-  } catch (error) {
-    console.error(error);
-    alert('파일 업로드 실패');
-  }
-}
-
-const postfetch_cyber_report_init_plan_file = async() => {
-  const formData = new FormData();
-  formData.append("fileType",cyberInitPlanData.value.fileType);
-  formData.append("fileCategory",cyberInitPlanData.value.fileCategory);
-  // formData.append("file",cyberInitPlanData.value.file);
-  
-  try {
-    const res = await axios.post('/api/vsoc/file',formData,{
-      headers: {
-        "Content-Type" : "multipart/form-data"
-      }
-    });
-    console.log(res);
-    const fileId = res.data.data.fileId;
-    console.log(fileId);
-    postData.value.data.fileAction.fileIdList.push(fileId);
-    console.log(postData.value.data.fileAction.fileIdList);
-  } catch (error) {
-    console.error(error);
-    alert('파일 업로드 실패');
-  }
-}
-
-const postfetch_cyber_report_renewal_evidence_file = async() => {
-  const formData = new FormData();
-  formData.append("fileType",cyberRenewalEvidenceData.value.fileType);
-  formData.append("fileCategory",cyberRenewalEvidenceData.value.fileCategory);
-  // formData.append("file",cyberRenewalEvidenceData.value.file);
-  
-  try {
-    const res = await axios.post('/api/vsoc/file',formData,{
-      headers: {
-        "Content-Type" : "multipart/form-data"
-      }
-    });
-    console.log(res);
-    const fileId = res.data.data.fileId;
-    console.log(fileId);
-    postData.value.data.fileAction.fileIdList.push(fileId);
-    console.log(postData.value.data.fileAction.fileIdList);
-  } catch (error) {
-    console.error(error);
-    alert('파일 업로드 실패');
-  }
-}
-
-const postfetch_cyber_report_renewal_plan_file = async() => {
-  const formData = new FormData();
-  formData.append("fileType",cyberRenewalPlanData.value.fileType);
-  formData.append("fileCategory",cyberRenewalPlanData.value.fileCategory);
-  // formData.append("file",cyberRenewalPlanData.value.file);
-  
-  try {
-    const res = await axios.post('/api/vsoc/file',formData,{
-      headers: {
-        "Content-Type" : "multipart/form-data"
-      }
-    });
-    console.log(res);
-    const fileId = res.data.data.fileId;
-    console.log(fileId);
-    postData.value.data.fileAction.fileIdList.push(fileId);
-    console.log(postData.value.data.fileAction.fileIdList);
-  } catch (error) {
-    console.error(error);
-    alert('파일 업로드 실패');
-  }
-}
-
-const postfetch_cyber_report_final_evidence_file = async() => {
-  const formData = new FormData();
-  formData.append("fileType",cyberFinalEvidenceData.value.fileType);
-  formData.append("fileCategory",cyberFinalEvidenceData.value.fileCategory);
-  // formData.append("file",cyberFinalEvidenceData.value.file);
-  
-  try {
-    const res = await axios.post('/api/vsoc/file',formData,{
-      headers: {
-        "Content-Type" : "multipart/form-data"
-      }
-    });
-    console.log(res);
-    const fileId = res.data.data.fileId;
-    console.log(fileId);
-    postData.value.data.fileAction.fileIdList.push(fileId);
-    console.log(postData.value.data.fileAction.fileIdList);
-  } catch (error) {
-    console.error(error);
-    alert('파일 업로드 실패');
-  }
-}
-
-const postfetch_cyber_report_final_report_file = async() => {
-  const formData = new FormData();
-  formData.append("fileType",cyberFinalReportData.value.fileType);
-  formData.append("fileCategory",cyberFinalReportData.value.fileCategory);
-  // formData.append("file",cyberFinalReportData.value.file);
-  
-  try {
-    const res = await axios.post('/api/vsoc/file',formData,{
-      headers: {
-        "Content-Type" : "multipart/form-data"
-      }
-    });
-    console.log(res);
-    const fileId = res.data.data.fileId;
-    console.log(fileId);
-    postData.value.data.fileAction.fileIdList.push(fileId);
-    console.log(postData.value.data.fileAction.fileIdList);
   } catch (error) {
     console.error(error);
     alert('파일 업로드 실패');
@@ -1091,6 +964,3 @@ const postfetch_cyber_report_final_report_file = async() => {
 
 onMounted(getfetch_cyber_detail);
 </script>
-
-<style scoped>
-</style>

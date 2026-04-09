@@ -724,20 +724,22 @@
             </tr>
             <tr>
               <th colspan="2">파일 첨부</th>
-              <td class="group" v-for="item in incidnetReceiptFile?.slice(0,3)">
-                파일 ID : {{ item.id }} / 파일 설명 : {{ item.fileCategoryDescription }}
+              <td class="group" v-for="item in incidnetReceiptFile">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
+                <button 
+                  style="border: 1px solid black; border-radius: 10px; padding: 2px 8px;" 
+                  @click="removeFileAction(item.id)">
+                  x
+                </button>
               </td>
               <td class="file">
-                <form @submit.prevent="postfetch_incident_receipt_file">
+                <form>
                   <div class="group">
                     <div class="input">
-                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="incidnetReceiptData.fileCategory" readonly>
+                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="incidnetReceiptData.file?.name" readonly>
                       <label>파일 선택
-                        <input type="file" @change="onReceiptFileChange" />
+                        <input type="file" @change="(e) => onFileChange(e,incidnetReceiptData)" />
                       </label>
-                    </div>
-                    <div class="button">
-                      <button type="submit">업로드</button>
                     </div>
                   </div>
                 </form>
@@ -1017,20 +1019,22 @@
             </tr>
             <tr>
               <th colspan="2">파일 첨부</th>
-              <td class="group" v-for="item in incidnetRenewalFile?.slice(0,3)">
-                파일 ID : {{ item.id }} / 파일 설명 : {{ item.fileCategoryDescription }}
+              <td class="group" v-for="item in incidnetRenewalFile">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
+                <button
+                  style="border: 1px solid black; border-radius: 10px; padding: 2px 8px;"
+                  @click="removeFileAction(item.id)">
+                  x
+                </button>
               </td>
               <td class="file">
-                <form @submit.prevent="postfetch_incident_renewal_file">
+                <form>
                   <div class="group">
                     <div class="input">
-                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="incidentRenewalData.fileCategory" readonly>
+                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="incidentRenewalData.file?.name" readonly>
                       <label>파일 선택
-                        <input type="file" @change="onRenewalFileChange" />
+                        <input type="file" @change="(e) => onFileChange(e,incidentRenewalData)" />
                       </label>
-                    </div>
-                    <div class="button">
-                      <button type="submit">업로드</button>
                     </div>
                   </div>
                 </form>
@@ -1234,18 +1238,14 @@
             </tr>
             <tr>
               <th colspan="2">파일 첨부</th>
-              <td colspan="2">-</td>
               <td class="file" colspan="3">
-                <form @submit.prevent="postfetch_incident_renewal_file">
+                <form>
                   <div class="group">
                     <div class="input">
-                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="incidentRenewalData.fileCategory" readonly>
+                      <input type="text" placeholder="업로드할 파일을 선택하세요" :value="incidentRenewalData.file?.name" readonly>
                       <label>파일 선택
-                        <input type="file" @change="onRenewalFileChange" />
+                        <input type="file" @change="(e) => onFileChange(e,incidentRenewalData)" />
                       </label>
-                    </div>
-                    <div class="button">
-                      <button type="submit">업로드</button>
                     </div>
                   </div>
                 </form>
@@ -1378,7 +1378,7 @@ const postData = ref({
   fileAction: {
     fileType: "INCIDENT",
     fileIdList: [],
-    deleteFileIdList: null,
+    deleteFileIdList: [],
   },
   deleteRenewalActionIdList: [],
 })
@@ -1609,6 +1609,17 @@ const removeRenewalAction = (item, index) => {
   syncRenewalActionToPostData();
 };
 
+// 첨부파일 삭제 메서드
+const removeFileAction = (fileId) => {
+  if(!fileId) return;
+
+  const deleteList = postData.value.fileAction.deleteFileIdList;
+
+  if(!deleteList.includes(fileId)) {
+    deleteList.push(fileId);
+  }
+}
+
 watch(
   () => inputCheckboxNone.value,
   (flags) => {
@@ -1801,32 +1812,40 @@ const openFinishDone = () => {
   })
 };
 
-// 파일업로드 테스트 (현재 DLP 파일 반출 보안 문제로 file은 제외하고 테스트)
+// 파일업로드 관련 코드
+
+// 사고 접수 내역 파일 데이터 상태값
 const incidnetReceiptData = ref({
   fileType: "INCIDENT",
   fileCategory: "RECEIPT_DATA",
-  // file: null,
+  file: null,
 })
 
+// 갱신 내역 파일 데이터 상태값
 const incidentRenewalData = ref({
   fileType: "INCIDENT",
   fileCategory: "RENEWAL_DATA",
-  // file: null,
+  file: null,
 })
 
-const onReceiptFileChange = (e) => {
-  incidnetReceiptData.value.file = e.target.files[0];
+// 파일 선택 이벤트 처리
+const onFileChange = async (e, data) => {
+  const selectFile = e.target.files[0];
+
+  if (!selectFile) return;
+
+  data.file = selectFile;
+  await postfetch_incident_file(data);
+
+  e.target.value = "";
 }
 
-const onRenewalFileChange = (e) => {
-  incidentRenewalData.value.file = e.target.files[0];
-}
-
-const postfetch_incident_renewal_file = async() => {
+// 파일 업로드 API 호출
+const postfetch_incident_file = async(fileData) => {
   const formData = new FormData();
-  formData.append("fileType",incidentRenewalData.value.fileType);
-  formData.append("fileCategory",incidentRenewalData.value.fileCategory);
-  // formData.append("file",incidentRenewalData.value.file);
+  formData.append("fileType",fileData.fileType);
+  formData.append("fileCategory",fileData.fileCategory);
+  formData.append("file",fileData.file);
   
   try {
     const res = await axios.post('/api/vsoc/file',formData,{
@@ -1834,50 +1853,37 @@ const postfetch_incident_renewal_file = async() => {
         "Content-Type" : "multipart/form-data"
       }
     });
-    console.log(res);
     const fileId = res.data.data.fileId;
-    console.log(fileId);
     postData.value.fileAction.fileIdList.push(fileId);
-    console.log(postData.value.fileAction.fileIdList);
   } catch (error) {
     console.error(error);
     alert('파일 업로드 실패');
   }
 }
 
-const postfetch_incident_receipt_file = async() => {
-  const formData = new FormData();
-  formData.append("fileType",incidnetReceiptData.value.fileType);
-  formData.append("fileCategory",incidnetReceiptData.value.fileCategory);
-  // formData.append("file",incidnetReceiptData.value.file);
-  
-  try {
-    const res = await axios.post('/api/vsoc/file',formData,{
-      headers: {
-        "Content-Type" : "multipart/form-data"
-      }
-    });
-    console.log(res);
-    const fileId = res.data.data.fileId;
-    console.log(fileId);
-    postData.value.fileAction.fileIdList.push(fileId);
-    console.log(postData.value.fileAction.fileIdList);
-  } catch (error) {
-    console.error(error);
-    alert('파일 업로드 실패');
-  }
-}
-
-// 파일 (신고서 접수 자료/신고서 갱신 자료) Parsing (테스트중)
+// 파일 (신고서 접수 자료/신고서 갱신 자료) Parsing
 const incidnetReceiptFile = computed(() => {
-  return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "신고서 접수 자료")})
+  const deleteFileIdList = postData.value.fileAction.deleteFileIdList ?? [];
+
+  return allData.value?.fileList?.filter( item => {
+    return (
+    item.fileCategoryDescription === "신고서 접수 자료" && 
+    !deleteFileIdList.includes(item.id)
+  );
+  }) ?? [];
+})
 
 const incidnetRenewalFile = computed(() => {
-  return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "신고서 갱신 자료")})
+  const deleteFileIdList = postData.value.fileAction.deleteFileIdList ?? [];
+
+  return allData.value?.fileList?.filter( item => {
+    return (
+    item.fileCategoryDescription === "신고서 갱신 자료" && 
+    !deleteFileIdList.includes(item.id)
+  );
+  }) ?? [];
+})
 //
 
 onMounted(getfetch_katri_detail);
 </script>
-
-<style scoped>
-</style>

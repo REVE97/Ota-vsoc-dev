@@ -236,8 +236,12 @@
             <tr>
               <th>취약점 관리 상태</th>
               <td>{{ allData?.mgmtStatus }}</td>
-              <th></th>
-              <td></td>
+            </tr>
+            <tr>
+              <th>취약점 관리 상태 파일</th>
+              <td class="group" v-for="item in allData?.fileList">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -254,11 +258,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>2026-00-00</td>
-              <td>Changing</td>
-              <td>홍*동</td>
-              <td>{{ allData?.fileList?.[0].fileCategoryDescription }}</td>
+            <tr v-for="item in allData?.hisList">
+              <td>{{ getDate(item.createdAt) }}</td>
+              <td>{{ item.activity }}</td>
+              <td>{{ item.manager }}</td>
+              <td>{{ item.originalName }}</td>
             </tr>
           </tbody>
         </table>
@@ -379,7 +383,7 @@ const getfetch_button_link = async() => {
 const deletefetch_vulner_detail = async() => {
   try {
     const vulnerabilityReportId = route.params.vulnerabilityReportId;
-    await axios.delete(`/api/vsoc/monitoring-report/vulnerability/${vulnerabilityReportId}`);
+    await axios.post(`/api/vsoc/monitoring-report/vulnerability/${vulnerabilityReportId}`);
   } catch (error) {
     console.error(error);
     alert('데이터 삭제 실패!');

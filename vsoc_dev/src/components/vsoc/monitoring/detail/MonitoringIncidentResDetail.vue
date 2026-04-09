@@ -111,15 +111,30 @@
             </tr>
             <tr>
               <th>첨부파일</th>
-              <td colspan="3" class="input"></td>
+              <td 
+                colspan="3" 
+                class="group"
+                v-for="item in cyberInitEvidenceFileList">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
+              </td>
             </tr>
             <tr>
               <th>사이버보안 사고 대응 절차, 역할 및 대응 일정 보고서</th>
-              <td colspan="3" class="input"></td>
+              <td 
+                colspan="3" 
+                class="group"
+                v-for="item in cyberInitProcedureFileList">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
+              </td>
             </tr>
             <tr>
               <th>사이버보안 사고 대응 계획 보고서</th>
-              <td colspan="3" class="input"></td>
+              <td 
+                colspan="3" 
+                class="group"
+                v-for="item in cyberInitPlanFileList">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -184,11 +199,21 @@
             </tr>
             <tr>
               <th>첨부파일</th>
-              <td colspan="3"></td>
+              <td 
+                colspan="3"
+                class="group"
+                v-for="item in cyberRenewalEvidenceFileList">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
+              </td>
             </tr>
             <tr>
               <th>사이버보안 사고 대응 계획 보고서</th>
-              <td colspan="3"></td>
+              <td 
+                colspan="3"
+                class="group"
+                v-for="item in cyberRenewalPlanFileList">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -217,11 +242,21 @@
             </tr>
             <tr>
               <th>첨부파일</th>
-              <td colspan="3" class="input"></td>
+              <td 
+                colspan="3" 
+                class="group"
+                v-for="item in cyberFinalEvidenceFileList">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
+              </td>
             </tr>
             <tr>
               <th>사고 대응 보고서</th>
-              <td colspan="3" class="input"></td>
+              <td 
+                colspan="3" 
+                class="group"
+                v-for="item in cyberFinalReportFileList">
+                파일명 : {{ item.originalName }} / {{ item.fileCategoryDescription }}
+              </td>
             </tr>
             <tr>
               <th>대응 책임자</th>
@@ -282,6 +317,28 @@ const isMediaExposedParsing = computed(() => {
   if(allData?.value?.isMediaExposed === 0) return "N";
 })
 
+// 사이버 리포트 파일 파싱
+const cyberInitEvidenceFileList = computed(() => {
+  return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "사이버 리포트 최초 증빙 자료")})
+
+const cyberInitProcedureFileList = computed(() => {
+  return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "사이버 리포트 최초 대응 절차/역할/일정 보고서")})
+
+const cyberInitPlanFileList = computed(() => {
+  return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "사이버 리포트 최초 대응 계획 보고서")})
+
+const cyberRenewalPlanFileList = computed(() => {
+  return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "사이버 리포트 갱신 대응 계획 보고서")})
+
+const cyberRenewalEvidenceFileList = computed(() => {
+  return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "사이버 리포트 갱신 증빙 자료")})
+
+const cyberFinalEvidenceFileList = computed(() => {
+  return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "사이버 리포트 종료 증빙 자료")})
+
+const cyberFinalReportFileList = computed(() => {
+  return allData.value?.fileList?.filter( item => item.fileCategoryDescription === "사이버 리포트 종료 사고 대응 보고서")})
+
 // 모니터링 리포트 사이버 리포트 상세조회 API 호출
 const getfetch_cyber_detail = async() => {
   try {
@@ -313,7 +370,7 @@ const getfetch_button_link = async() => {
 const deletefetch_cyber_detail = async() => {
   try {
     const cyberReportId = route.params.cyberReportId;
-    await axios.delete(`/api/vsoc/monitoring-report/cyber/${cyberReportId}`);
+    await axios.post(`/api/vsoc/monitoring-report/cyber/${cyberReportId}`);
   } catch (error) {
     console.error(error);
     alert('데이터 삭제 실패');
